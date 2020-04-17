@@ -1,4 +1,4 @@
-# SMP_ZGamma_Theory
+# SMP_ZGamma_MCFM
 
 ## Setup
 
@@ -28,8 +28,6 @@ SMP
  ->mcfm # has the contents of the "Bin" folder in the MCFM package
 |   |
 |   -> 
- -> matrix
-|
  -> condor
 ```
 ### Excecutables
