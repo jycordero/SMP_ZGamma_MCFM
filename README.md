@@ -32,5 +32,15 @@ SMP
 ```
 ### Excecutables
 
-  * submit.sh
-    * 
+```bash
+. submit.sh [$1] [$2] [$3]
+```
+  * $1
+    * Tag for the process
+    * if `tag=test` is tests the submission process
+  * $2
+    * Coupling variable to set non--zero value
+    * coupling can take values { sm, h1Z, h1gamma, h2Z, h2gamma, h3Z, h3gamma, h4Z, h4gamma }
+  * $3
+    * value to set the coupling constant
+
