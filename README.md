@@ -1,5 +1,7 @@
 # SMP_ZGamma_MCFM
 
+This repo is used to calculate the theoretical prediction of the differential cross section @NLO for the process `p+p -> Z+Gamma` using the package https://mcfm.fnal.gov/
+
 ## Setup
 
 Generate the proper CMSSW enviroment
