@@ -36,7 +36,7 @@ else
 	cp -r ../../* .
 
 	createMCFM $2 $3
-	cp $CMSSW_BASE/src/mcfm/input/input_${2}.ini .
+	cp $CMSSW_BASE/src/SMP_ZGamma_MCFM/mcfm/input/input_${2}.ini .
 	
 	rm -r batch 
 
@@ -106,9 +106,9 @@ createBatch () {
 
 createMCFM () {
 	INIFILE=input_${1}.ini
-	INIOUT=$CMSSW_BASE/src/mcfm/input/$INIFILE
+	INIOUT=$CMSSW_BASE/src/SMP_ZGamma_MCFM/mcfm/input/$INIFILE
 
-	cat $CMSSW_BASE/src/mcfm/input_ini.ini > $INIOUT
+	cat $CMSSW_BASE/src/SMP_ZGamma_MCFM/mcfm/input_ini.ini > $INIOUT
 	
 	echo "# Anomalous couplings of the W and Z" >> $INIOUT
 	echo "[anom_wz] " >> $INIOUT

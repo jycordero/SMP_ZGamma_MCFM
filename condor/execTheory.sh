@@ -20,7 +20,7 @@ echo "Creating project.."
 #scramv1 b ProjectRename
 echo "--Created in $PWD"
 cmsenv
-cd mcfm 
+cd SMP_ZGamma_MCFM/mcfm 
 
 echo "MCFM..."
 echo "-- Location: $PWD"
