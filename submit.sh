@@ -47,19 +47,20 @@ else
 	createMCFM $ORDER $COUPLING $VALUE
 	cp $CMSSW_BASE/src/SMP_ZGamma_MCFM/mcfm/input/input_${ORDER}_${COUPLING}.ini .
 	
-	rm -r batch 
+	rm -rf batch 
 
 	if [ "$TEST" = false ]; then
 		echo "This was NOT a TEST" 
-		tar --exclude='batch/*' -czf source.tar.gz $CMSSW_BASE/..
-		condor_submit $BATCHFILE
+		tar -czf source.tar.gz -X exclude.txt $CMSSW_BASE/..
+		#condor_submit $BATCHFILE
 
 		#rm source.tar.gz
 	else
 		if [ "$TAG" = test ] || [ "$TAG"  = Test ] || [ "$TAG" = TEST ]; then
 			echo "This was SUBMIT a TEST" 
-			tar --exclude='batch/*' -czf source.tar.gz $CMSSW_BASE/..
-			condor_submit $BATCHFILE
+			#tar --exclude='batch/*' --exclude='$CMSSW_BASE/src/SMP_ZGamma_Ma*' -czf source.tar.gz $CMSSW_BASE/..
+			tar -czf source.tar.gz -X exclude.txt $CMSSW_BASE/..
+			#condor_submit $BATCHFILE
 
 			#rm source.tar.gz
 		else
@@ -201,7 +202,10 @@ createMCFM () {
 	echo "    cWWH = 0.0" >> $INIOUT
 }
 modifyOrder() {
-        echo "    part = $1" >> $2
+	ORDER=$1
+	OUTFILE=$2
+
+        echo "    part = $ORDER" >> $OUTFILE
 }
 modifyCoupling () {
         # 1 current variable to write
