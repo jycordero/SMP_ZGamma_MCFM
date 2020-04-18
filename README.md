@@ -2,6 +2,13 @@
 
 This repo is used to calculate the theoretical prediction of the differential cross section @NLO for the process `p+p -> Z+Gamma` using the package https://mcfm.fnal.gov/
 
+Table of Contents
+===================
+  * [Setup](#setup)
+  * [Folder Structure](#folder-structure)
+  * [Excecutable](#excecutables)
+  * [Testing](#testing)
+
 ## Setup
 
 Generate the proper CMSSW enviroment
@@ -19,11 +26,10 @@ Extract the project directory from github
 git clone git@github.com:jycordero/SMP_ZGamma_Theory.git
 ```
 
-## Folder structure and excecutables
+## Folder structure
 
 **Note**: when refering to the project directory(PROJDIR) this means `$CMSSW_BASE/SMP_ZGamma_MCFM`, also note PROJDIR is **not** an eviromental variable
 
-### Folders
 Displayed are the folders that are the most relevant for the analysis
 
 ```
@@ -41,7 +47,7 @@ SMP
           |
           -> [$TAG]_[$COUPLING]_[$DATE] # Output of submited job, SHOULD BE TRANSFERED TO EOS, since nobackup has limited space
 ```
-### Excecutables
+## Excecutables
 
 **submit.sh**
 ---
@@ -72,3 +78,11 @@ This file creates the configutation files to submit a mcfc job to **condor**. It
 **Description**
 
 This file is the excedutable that will ran at the cluster. It runs the `mcfm_omp` with the input file(`PROJDIR/mcfm/input/iniput_[$COUPLING].ini`) created by the `submit.sh` executable.
+
+## Testing
+
+Run the following code to test the submission
+
+```bash
+. submit.sh test test 0
+```
