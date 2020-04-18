@@ -61,15 +61,17 @@ SMP
 This file creates the configutation files to submit a mcfc job to **condor**. It also creates the **mcfc** config file to 
 
 ```bash
-. submit.sh [$1] [$2] [$3]
+. submit.sh [$1] [$2] [$3] [$4]
 ```
   * $1
     * Tag for the process
     * if `tag=test` is tests the submission process
   * $2
+    * The Order of the calculation, it could be lo, nlo, nnlo
+  * $3
     * Coupling variable to set non--zero value
     * coupling can take values { sm, h1Z, h1gamma, h2Z, h2gamma, h3Z, h3gamma, h4Z, h4gamma }
-  * $3
+  * $4
     * value to set the coupling constant
     
 **execTheory.sh**

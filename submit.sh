@@ -1,7 +1,12 @@
 TOPDIR=$PWD
 
+TAG=$1
+ORDER=$2
+COUPLING=$3
+VALUE=$4
+
 TEST=false
-if [ "$1" = test ] || [ "$1"  = Test ] || [ "$1" = TEST ]; then
+if [ "$TAG" = test ] || [ "$TAG"  = Test ] || [ "$TAG" = TEST ]; then
 	TEST=true
 else
 	TEST=false
@@ -10,17 +15,21 @@ fi
 cmsenv
 cd condor
 
-if [ -z "$1" ]; then
+if [ -z "$TAG" ]; then
 	echo "Please provide the first input variable"
-elif [ -z "$2" ]; then
+elif [ -z "$ORDER" ]; then
 	echo "Please provide the second input variable"
-elif [ "$( hcoupling $2 )" == "false" ]; then 
-	echo "$2 is not a valid input"
-elif [ -z "$3" ]; then
+elif [ "$( horder $ORDER )" == "false" ]; then 
+	echo "$ORDER is not a valid input"
+elif [ -z "$COUPLING" ]; then
+	echo "Please provide the second input variable"
+elif [ "$( hcoupling $COUPLING )" == "false" ]; then 
+	echo "$COUPLING is not a valid input"
+elif [ -z "$VALUE" ]; then
 	echo "Please provide the third argument"
 else
 	DATE=`date '+%Y_%m_%d_%H%M%S'`
-	OUTDIR=$1_$2_$DATE
+	OUTDIR=${TAG}_${ORDER}_${COUPLING}_${DATE}
 
 	echo "Creating outdirectory batch/$OUTDIR"
 	mkdir -p batch/$OUTDIR
@@ -30,13 +39,13 @@ else
 	mkdir reports
 	
 	echo "Creating batch config file"
-        BATCHFILE=batch_${1}_mcfm
-	createBatch $2 $DATE $TEST
+        BATCHFILE=batch_${ORDER}_${COUPLING}__mcfm
+	createBatch $ORDER $COUPLING $DATE $TEST
 
 	cp -r ../../* .
 
-	createMCFM $2 $3
-	cp $CMSSW_BASE/src/SMP_ZGamma_MCFM/mcfm/input/input_${2}.ini .
+	createMCFM $ORDER $COUPLING $VALUE
+	cp $CMSSW_BASE/src/SMP_ZGamma_MCFM/mcfm/input/input_${ORDER}_${COUPLING}.ini .
 	
 	rm -r batch 
 
@@ -47,7 +56,7 @@ else
 
 		#rm source.tar.gz
 	else
-		if [ "$2" = test ] || [ "$2"  = Test ] || [ "$2" = TEST ]; then
+		if [ "$TAG" = test ] || [ "$TAG"  = Test ] || [ "$TAG" = TEST ]; then
 			echo "This was SUBMIT a TEST" 
 			tar --exclude='batch/*' -czf source.tar.gz $CMSSW_BASE/..
 			condor_submit $BATCHFILE
@@ -63,6 +72,16 @@ cd $TOPDIR
 
 
 #######################################################
+horder () {
+	if [ "$1" != "lo" ] && \
+	   [ "$1" != "nlo" ] && \
+	   [ "$1" != "nnlo" ]; then 
+		echo "false"
+	else
+		echo "true"
+	fi
+}
+
 
 hcoupling () {
 	if [ "$1" != "sm" ] && \
@@ -78,7 +97,12 @@ hcoupling () {
 }
 
 createBatch () {
-        BATCHFILE=batch_${1}_mcfm
+	ORDER=$1
+	COUPLING=$2
+	DATE=$3
+	TEST=$4	
+
+        BATCHFILE=batch_${ORDER}_${COUPLING}_mcfm
 
         echo "Universe              = vanilla" >  $BATCHFILE
         echo "Should_Transfer_Files = YES"     >> $BATCHFILE
@@ -88,27 +112,57 @@ createBatch () {
         echo "request_disk          = 4000000" >> $BATCHFILE
         echo "request_memory        = 2048"    >> $BATCHFILE
         echo "" >> $BATCHFILE
-	echo "Arguments             = input_${1}.ini" >> $BATCHFILE
+	echo "Arguments             = input_${ORDER}_${COUPLING}.ini" >> $BATCHFILE
         echo "Executable            = execTheory.sh"  >> $BATCHFILE
         echo "Transfer_Input_Files  = source.tar.gz"  >> $BATCHFILE
-	if [ "$3" = true ];then
-		echo "Output                = reports/${1}_${2}_mcfm_\$(Cluster)_\$(Process).stdout" >> $BATCHFILE
-		echo "Error                 = reports/${1}_${2}_mcfm_\$(Cluster)_\$(Process).stderr" >> $BATCHFILE
-		echo "Log                   = reports/${1}_${2}_mcfm_\$(Cluster)_\$(Process).log"    >> $BATCHFILE
+	if [ "$TEST" = true ];then
+		echo "Output                = reports/${ORDER}_${DATE}_mcfm_\$(Cluster)_\$(Process).stdout" >> $BATCHFILE
+		echo "Error                 = reports/${ORDER}_${DATE}_mcfm_\$(Cluster)_\$(Process).stderr" >> $BATCHFILE
+		echo "Log                   = reports/${ORDER}_${DATE}_mcfm_\$(Cluster)_\$(Process).log"    >> $BATCHFILE
 	else
-		echo "Output                = reports/${1}_${2}_mcfm_\$(Cluster)_\$(Process).stdout" >> $BATCHFILE
-		echo "Error                 = reports/${1}_${2}_mcfm_\$(Cluster)_\$(Process).stderr" >> $BATCHFILE
-		echo "Log                   = reports/${1}_${2}_mcfm_\$(Cluster)_\$(Process).log"    >> $BATCHFILE
+		echo "Output                = reports/${ORDER}_${DATE}_mcfm_\$(Cluster)_\$(Process).stdout" >> $BATCHFILE
+		echo "Error                 = reports/${ORDER}_${DATE}_mcfm_\$(Cluster)_\$(Process).stderr" >> $BATCHFILE
+		echo "Log                   = reports/${ORDER}_${DATE}_mcfm_\$(Cluster)_\$(Process).log"    >> $BATCHFILE
 	fi
 
         echo "Queue">> $BATCHFILE
 }
 
 createMCFM () {
-	INIFILE=input_${1}.ini
+	ORDER=$1
+	COUPLING=$2
+	VALUE=$3
+
+	INIFILE=input_${ORDER}_${COUPLING}.ini
 	INIOUT=$CMSSW_BASE/src/SMP_ZGamma_MCFM/mcfm/input/$INIFILE
 
-	cat $CMSSW_BASE/src/SMP_ZGamma_MCFM/mcfm/input_ini.ini > $INIOUT
+        echo "mcfm_version = 9.0" > $INIOUT
+        echo "  " >> $INIOUT
+        echo "[general]" >> $INIOUT
+        echo "    # process number" >> $INIOUT
+        echo "    nproc = 300" >> $INIOUT
+        echo "    # part: lo, nlo, nnlo, nlocoeff, nnlocoeff" >> $INIOUT
+        modifyOrder $ORDER $INIOUT
+        echo "    # string to identify run" >> $INIOUT
+        echo "    runstring = 14TeV" >> $INIOUT
+        echo "    sqrts = 14000" >> $INIOUT
+        echo "    # ih1, ih2: +1 for proton, -1 for antiproton" >> $INIOUT
+        echo "    ih1 = +1" >> $INIOUT
+        echo "    ih2 = +1" >> $INIOUT
+        echo "    zerowidth = .false." >> $INIOUT
+        echo "    removebr = .false." >> $INIOUT
+        echo "    # electroweak corrections: none, sudakov or exact" >> $INIOUT
+        echo "    ewcorr = none" >> $INIOUT
+        echo " " >> $INIOUT
+        echo "[nnlo]" >> $INIOUT
+        echo "    # optional: tau cutoff for NNLO processes, otherwise default value is chosen" >> $INIOUT
+        echo "    #     for less than 1% cutoff effects in the total cross section." >> $INIOUT
+        echo "    # taucut = 0.001" >> $INIOUT
+        echo "    # optional array of numerical taucut values that should be sampled on the fly in addition." >> $INIOUT
+        echo "    # these values can be smaller or larger than the nominal taucut value" >> $INIOUT
+        echo "    # tcutarray = 0.001 0.002 0.003 0.004 0.005 0.01 0.02 0.03 0.05 0.1 0.2 0.4 0.8 1.0" >> $INIOUT
+
+	cat $CMSSW_BASE/src/SMP_ZGamma_MCFM/mcfm/input_skeleton_ini.ini >> $INIOUT
 	
 	echo "# Anomalous couplings of the W and Z" >> $INIOUT
 	echo "[anom_wz] " >> $INIOUT
@@ -129,7 +183,7 @@ createMCFM () {
 
         for curVar in "${curentVariable[@]}";
         do
-                modifyCoupling $curVar $1 $2 $INIOUT
+                modifyCoupling $curVar $COUPLING $VALUE $INIOUT
         done
 
 
@@ -146,18 +200,24 @@ createMCFM () {
 	echo "    cttH = 0.0" >> $INIOUT
 	echo "    cWWH = 0.0" >> $INIOUT
 }
-
+modifyOrder() {
+        echo "    part = $1" >> $2
+}
 modifyCoupling () {
         # 1 current variable to write
         # 2 coupling variable
         # 3 coupling value
         # 4 output file
+	CURVAL=$1
+	COUPLING=$2
+	VALUE=$3
+	OUTFILE=$4
 
-        if [ "$1" = "$2" ]; then
-                echo "    # $1" >> $4
-                echo "    $1 = $3">> $4
+        if [ "$CURVAL" = "$COUPLING" ]; then
+                echo "    # $CURVAL" >> $OUTFILE
+                echo "    $CURVAL = $VALUE">> $OUTFILE
         else
-                echo "    # $1" >> $4
-                echo "    $1 = 0">> $4
+                echo "    # $CURVAL" >> $OUTFILE
+                echo "    $CURVAL = 0">> $OUTFILE
         fi
 }
