@@ -37,7 +37,7 @@ SMP
     |
     |-> batch #folder where all the output of the condor output gets dumped
           |
-          -> [$TAG]_[$COUPLING]_[$DATE]
+          -> [$TAG]_[$COUPLING]_[$DATE] # Output of submited job, SHOULD BE TRANSFERED TO EOS, since nobackup has limited space
 ```
 ### Excecutables
 
@@ -69,4 +69,4 @@ This file creates the configutation files to submit a mcfc job to **condor**. It
 
 **Description**
 
-This file is the excedutable that will ran at the cluster. It runs the `mcfm_omp` with the input file(`iniput_[$COUPLING].ini`) created by the `submit.sh` executable
+This file is the excedutable that will ran at the cluster. It runs the `mcfm_omp` with the input file(`PROJDIR/mcfm/input/iniput_[$COUPLING].ini`) created by the `submit.sh` executable.
