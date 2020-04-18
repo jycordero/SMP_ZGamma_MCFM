@@ -49,6 +49,8 @@ SMP
 ```
 ## Excecutables
 
+:warning: Right now the tarball that is sent to the cluster is not very smart, is compresses the entire `$CMSSW_BASE` directory, so you might encounter problems with memory on the cluster size due to this
+
 **submit.sh**
 ---
 
