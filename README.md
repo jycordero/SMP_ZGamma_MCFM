@@ -88,3 +88,18 @@ Run the following code to test the submission
 ```bash
 . submit.sh test test 0
 ```
+
+## Note on condor
+
+`condor_q`
+  * Gives the list of jobs
+  * If you have a job that if being held the most common reasons are the folowing
+     * Your `nobackup` quota is at it's limit. you can check your quota with `quota -s`
+     * Requirements on the condor configuration file `batch_[test]_mcfm` are not being met on the cluster size
+  * If you want to rerun the held jobs (ex. after making the space in `nobackup`) you can do so with the next command
+  
+`condor_release -name [SHEDD_NAME] [USER]`
+  * Releases all the held jobs on SHEDD_NAME by USER
+  
+`condor_rm -name [SHEDD_NAME] [JOB_ID](Optional)`
+  * Eliminates JOB_ID from the SHEDD
