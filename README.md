@@ -23,7 +23,7 @@ cmsenv
 
 Extract the project directory from github
 ```bash
-git clone git@github.com:jycordero/SMP_ZGamma_Theory.git
+git clone git@github.com:jycordero/SMP_ZGamma_MCFM.git
 ```
 
 ## Folder structure
